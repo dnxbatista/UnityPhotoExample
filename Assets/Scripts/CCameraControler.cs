@@ -10,7 +10,7 @@ public class CCameraControler : MonoBehaviour
     [SerializeField] private Camera _pictureCamera; // I Know there are a better names for this but, is not a big thing in this project
     [SerializeField] private Material _cameraRenderMaterial;
 
-    private Vector3 _startPosition = new();
+    [SerializeField] private Transform _itemStarPos;
 
     private InputAction _useCameraAction;
     private InputAction _faceCameraAction;
@@ -22,9 +22,7 @@ public class CCameraControler : MonoBehaviour
     #region Engine Functions
     private void Start()
     {
-        _cameraRenderMaterial.mainTexture = _cameraRenderTexture;
-
-        _startPosition = transform.localPosition;
+        _cameraRenderMaterial.SetTexture("_MainTexture", _cameraRenderTexture);
 
         _useCameraAction = InputSystem.actions.FindAction("Attack");
         _faceCameraAction = InputSystem.actions.FindAction("GetCamera");
@@ -37,7 +35,8 @@ public class CCameraControler : MonoBehaviour
         {
             _pictureCamera.Render();
 
-            _cameraRenderMaterial.mainTexture = _pictureRenderTexture;
+            //_cameraRenderMaterial.mainTexture = _pictureRenderTexture;
+            _cameraRenderMaterial.SetTexture("_MainTexture", _pictureRenderTexture);
 
             numberOfPicturesTaken++;
             Debug.Log($"Snapshot taken! {numberOfPicturesTaken}");
@@ -45,7 +44,15 @@ public class CCameraControler : MonoBehaviour
 
         if (_restartCameraAction.WasPressedThisFrame())
         {
-            _cameraRenderMaterial.mainTexture = _cameraRenderTexture;
+            _cameraRenderMaterial.SetTexture("_MainTexture", _cameraRenderTexture);
+        }
+
+        if (_faceCameraAction.IsPressed())
+        {
+            transform.position = Vector3.Lerp(transform.position, _onFaceTransform.position, 8f * Time.deltaTime);
+        } else
+        {
+            transform.position = Vector3.Lerp(transform.position, _itemStarPos.position, 8f * Time.deltaTime);
         }
 
     }
